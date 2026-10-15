@@ -284,3 +284,7 @@ go test -cover ./...   # 覆盖率（根包 82% / server 81% / store 80%）
 ```
 
 `example_test.go` 里的示例是可运行的（`go test` 时一起校验输出）。
+
+## 许可证
+
+MIT © 2026 go31，见 [LICENSE](LICENSE)。

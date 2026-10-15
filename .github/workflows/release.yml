@@ -1,0 +1,72 @@
+name: release
+
+# 打 tag 即发布：先跑测试，再把镜像推到 GHCR。
+#   git tag v0.1.0-beta.1 && git push origin v0.1.0-beta.1
+# 产物：ghcr.io/go31/confdeck:<tag>（预发布版本同时打一个 beta 标签）
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.5'
+          cache: true
+      - run: go vet ./...
+      - run: go test ./...
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # 推 GHCR 需要
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          # 标签规则写死、不依赖 latest=auto 的隐式行为：
+          #   v0.1.0-beta.1 → v0.1.0-beta.1 + beta（预发布不动 latest）
+          #   v0.1.0        → v0.1.0 + latest
+          tags: |
+            type=ref,event=tag
+            type=raw,value=beta,enable=${{ contains(github.ref_name, '-') }}
+            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+          flavor: |
+            latest=false
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 汇总
+        run: |
+          {
+            echo "### 已发布镜像"
+            echo
+            echo '```'
+            echo "${{ steps.meta.outputs.tags }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

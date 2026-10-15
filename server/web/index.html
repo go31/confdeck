@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>confdeck</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">confdeck</div>
+
+    <nav id="scopes" class="nav" aria-label="作用域"></nav>
+
+    <div class="sidebar-foot">
+      <label for="token">管理 token</label>
+      <div class="token-row">
+        <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="粘贴 token">
+        <button id="token-apply" class="btn" type="button">应用</button>
+      </div>
+      <p class="hint">所有接口共用这一个 token；留空即未鉴权部署。</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="title">配置</h1>
+      <div class="topbar-actions">
+        <span id="status" class="status"></span>
+        <button id="refresh" class="btn" type="button">刷新</button>
+        <button id="save" class="btn btn-primary" type="button" disabled>保存修改</button>
+      </div>
+    </header>
+
+    <div id="banner" class="banner" hidden></div>
+
+    <div class="toolbar">
+      <input id="search" class="input" type="search" placeholder="搜索键名或说明" spellcheck="false">
+      <select id="filter" class="input select">
+        <option value="all">全部</option>
+        <option value="alert">需处理</option>
+        <option value="missing">未配置</option>
+        <option value="set">已配置</option>
+        <option value="undeclared">未声明</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="col-key">键</th>
+            <th class="col-value">值</th>
+            <th class="col-type">类型</th>
+            <th class="col-marks">标记</th>
+            <th class="col-desc">说明</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p id="empty" class="empty" hidden></p>
+    </div>
+
+    <div class="table-foot">
+      <span id="count"></span>
+    </div>
+  </main>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

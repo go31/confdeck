@@ -1,0 +1,13 @@
+# 数据文件（bbolt）：里面是明文配置，绝不入库。
+confdeck.db
+*.db
+*.db.lock
+
+# 本地跑出来的二进制
+/confdeckd
+/confdeckd.exe
+
+# 编辑器与系统
+.DS_Store
+.idea/
+.vscode/
